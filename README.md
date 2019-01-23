@@ -1,6 +1,6 @@
 # Deltille Camera Calibration
 
-##execute
+## execute
 
 ```
 g++ deltille_main.cpp -o CameraCalibration -O3 `pkg-config opencv --cflags --libs` && ./CameraCalibration
