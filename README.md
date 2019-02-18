@@ -49,4 +49,4 @@ In the final distribution we can see how the pattern has moved through the image
 
 ### Video
 
-![First Attemp](https://www.youtube.com/watch?v=QixfwxfU85Q&feature=youtu.be)
+https://www.youtube.com/watch?v=QixfwxfU85Q&feature=youtu.be
