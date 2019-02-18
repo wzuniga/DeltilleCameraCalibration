@@ -45,3 +45,8 @@ This is the initial distribution window, it will go through different divisions 
 In the final distribution we can see how the pattern has moved through the image, in the circles they are the places where the frames are better defined.
 
 ![First Attemp]url completa de la imagen)(https://github.com/wzuniga/DeltilleCameraCalibration/blob/master/Imagenes/Dist All.png)
+
+
+### Video
+
+![First Attemp]url completa de la imagen)(https://www.youtube.com/watch?v=QixfwxfU85Q&feature=youtu.be)
