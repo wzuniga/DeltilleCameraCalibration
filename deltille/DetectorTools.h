@@ -234,7 +234,7 @@ static inline void hessianResponseImpl(const cv::Mat &inputImage,
   const int rows = inputImage.rows;
   const int cols = inputImage.cols;
   const int stride = cols;
-
+  //std::cout << "Stride: " << stride << std::endl;
   // allocate output
   outputImage = cv::Mat::zeros(rows, cols, CV_64FC1);
 
@@ -242,6 +242,7 @@ static inline void hessianResponseImpl(const cv::Mat &inputImage,
   auto *in = inputImage.ptr<const ImageType>(1);
   auto *out = outputImage.ptr<double>(1) + 1;
   // double             norm = 1.0 / (255.0*255.0);
+
   /* move 3x3 window and convolve */
   for (int r = 1; r < rows - 1; ++r) {
     double v11, v12, v21, v22, v31, v32;

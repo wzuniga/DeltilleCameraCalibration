@@ -7,44 +7,20 @@
 using namespace cv;
 using namespace std;
 
-//#define CALIBRATION_LIFECAM_VIDEO     "calibration_videos/Triangles_Blue.mp4"
+//#define CALIBRATION_LIFECAM_VIDEO     "videos/Triangles_Blue.mp4"
+//#define CALIBRATION_LIFECAM_VIDEO     "videos/own.mp4"
+//#define CALIBRATION_LIFECAM_VIDEO     "videos/data.avi"
 #define CALIBRATION_LIFECAM_VIDEO     0
-
-// void window_setup() {
-//     int window_w = 640;
-//     int window_h = 480;
-//     string window_name;
-//     window_name = "CentersDistribution";
-
-//     namedWindow(window_name, WINDOW_NORMAL);
-//     resizeWindow(window_name, window_w, window_h);
-//     moveWindow(window_name, 0, 0);
-
-//     window_name = "CalibrationFrames";
-//     namedWindow(window_name, WINDOW_NORMAL);
-//     resizeWindow(window_name, window_w, window_h);
-//     moveWindow(window_name, window_w, 0);
-
-//     window_name = "InputFrame+Grid";
-//     namedWindow(window_name, WINDOW_NORMAL);
-//     resizeWindow(window_name, window_w, window_h);
-//     moveWindow(window_name, window_w * 2, 0);
-
-//     window_name = "Undistort";
-//     namedWindow(window_name, WINDOW_NORMAL);
-//     resizeWindow(window_name, window_w, window_h);
-//     moveWindow(window_name, 0, window_h);
-// }
 
 /**
  * @brief Initialize windows names, sizes and positions.
  */
 void window_setup() {
-    int window_w = 360 * 1.77;
-    int window_h = 240 * 1.77;
+    int window_w = 320 * 1.77;
+    int window_h = 260 * 1.77;
     //int window_w = 640;
     //int window_h = 480;
-    int second_screen_offset = 0;//1360;
+    int second_screen_offset = 30;//1360;
     string window_name;
     window_name = "CentersDistribution";
     namedWindow(window_name, WINDOW_NORMAL);
@@ -90,7 +66,7 @@ int main( int argc, char** argv ) {
     
     window_setup();
     //CameraCalibrationDeltille camera_calibration(cap, 11, 10);
-    int n_frames  = 40;
+    int n_frames  = 20;
     int grid_cols = 4;
     int grid_rows = 3;
     camera_calibration.calibrate_camera_iterative(10, n_frames, grid_rows, grid_cols);

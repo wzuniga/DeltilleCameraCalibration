@@ -91,6 +91,7 @@ public:
 	}
 
 	/**
+	 * @meaning selecion de frames de la camara
 	 * @brief Choose some frame to cover the screen area
 	 *
 	 * @param cap       Videocapture reference
@@ -154,8 +155,8 @@ public:
 					near_center = false;
 					//cout << "To far " << distance(block_center, c) << " to " << block_radio << endl;
 				}
-				circle(m_centroids, block_center, block_radio, Scalar(255, 0, 0));
-				circle(m_centroids, Point2f(c.x, c.y), 1, Scalar(0, 0, 255));
+				circle(m_centroids, block_center, block_radio, Scalar(255, 255, 0));
+				circle(m_centroids, Point2f(c.x, c.y), 1, Scalar(255, 0, 255));
 				if (near_center) {
 					if ( quadBins[y_block][x_block] < max_points) {
 						circle(m_centroids, c, 6, Scalar(0, 255, 0), -1);
@@ -169,15 +170,26 @@ public:
 
 						quadBins[y_block][x_block] ++;
 						for (int j = 0; j < pattern_points.size(); j++) {
-							circle(m_calibration, pattern_points[j], 8, color_palette[selected_frames]);
+							circle(m_calibration, pattern_points[j], 1, color_palette[selected_frames]);
 						}
 					} else {
 						skip_frames(cap, on_overflow_skip);
 						f += on_overflow_skip;
 					}
 				}
+				int line1  = 7; 
+				bool ln = true;
 				for (int p = 0; p < pattern_points.size(); p++) {
 					putText(frame, to_string(p), pattern_points[p], FONT_HERSHEY_COMPLEX_SMALL, 0.5, cvScalar(0, 0, 255), 1);
+					if(p < pattern_points.size() - 1 && !(p == line1)){
+						line( frame, pattern_points[p], pattern_points[p+1], Scalar(0, 255, 0), 1, 8 );
+					}if(p == line1){
+						line1 += (ln) ? 9 : 8;
+						ln = !ln;
+					}else if(p+9 < pattern_points.size()){
+						line( frame, pattern_points[p], pattern_points[p+9], Scalar(0, 255, 0), 1, 8 );
+						line( frame, pattern_points[p+9], pattern_points[p+1], Scalar(0, 255, 0), 1, 8 );
+					}
 				}
 
 			}
@@ -202,7 +214,7 @@ public:
 					rectangle(frame, Point(local_a_x, local_a_y), Point(local_b_x, local_b_y), cvScalar(255, 255, 255));
 				}
 			}
-			rectangle(m_centroids, Point(width * 0.15, height - 35), Point(width * 0.85, height), cvScalar(0, 0, 0), -1);
+			rectangle(m_centroids, Point(width * 0.15, height - 35), Point(width * 0.85, height), cvScalar(0, 0, 0), 1);
 			std::ostringstream total_str;
 			total_str << "Selected: " << selected_frames << "/" << n_frames;
 			putText(m_centroids, total_str.str(), cvPoint(width * 0.15, height - 10), FONT_HERSHEY_COMPLEX_SMALL, 1, cvScalar(255, 255, 0), 1, CV_AA);
@@ -238,6 +250,7 @@ public:
 		int select_frames = n_frames;
 		Mat m_calibration = Mat::zeros(Size(h, w), CV_8UC3);
 		Mat m_centroids = Mat::zeros(Size(h, w), CV_8UC3);
+
 		while (!select_frames_process(select_frames, rows, cols, m_calibration, m_centroids)) {
 			rows --;
 			cols --;
@@ -266,14 +279,27 @@ public:
 		}
 	}
 	void calibrate_camera_iterative(int n_iterations, int n_frames, int grid_rows, int grid_cols) {
+		int num_color_palette = 42;
+		RNG rng(12345);
+		vector<Scalar> color_palette(num_color_palette);
+		for (int i = 0; i < num_color_palette; i++)
+			color_palette[i] = Scalar(rng.uniform(0, 255), rng.uniform(0, 255), rng.uniform(0, 255));
+		
 		Mat frontoParallel = Mat::zeros(Size(h, w), CV_8UC3);
 		for (int i = 0; i < object_points_image.size(); i++) {
 			circle(frontoParallel, Point2f(object_points_image[i].x, object_points_image[i].y), 10, Scalar(255, 0, 0));
+			putText(frontoParallel, to_string(i), Point2f(object_points_image[i].x, object_points_image[i].y), FONT_HERSHEY_COMPLEX_SMALL, 0.5, cvScalar(0, 0, 255), 1);
+			if (i < object_points_image.size() - 1 )
+				line( frontoParallel, Point(object_points_image[i].x, object_points_image[i].y), Point(object_points_image[(i+1)%object_points_image.size()].x, object_points_image[(i+1)%object_points_image.size()].y), color_palette[i], 1, 8 );
 		}
+
 		imshow("FrontoParallel", frontoParallel);
+		cout << "calibrate_camera_iterative" << endl;
 		//waitKey(0);
 		select_frames(n_frames, grid_rows, grid_cols);
+		cout << "select frames" << endl;
 		collect_points();
+		cout << "Collect points" << endl;
 		calibrate_camera();
 		for (int i = 0; i < n_iterations; i++) {
 			//collect_points_fronto_parallel(REFINE_VARICENTER, REFINE_FP_INTERSECTION);
@@ -399,19 +425,27 @@ void CameraCalibration::collect_points_fronto_parallel(int refine_type, int refi
 		// imshow("img_out", img_out);
 		
 		// imwrite("frontoParallel/fp_" + to_string(f)+".png", img_out);
-
+		
 		for (int p = 0; p < n_points; p++) 
 			circle(input_undistorted, points_undistorted[p], 2, Scalar(0, 255, 0));
-
-		// HERE
-		// resize(img_out, img_in, cv::Size(), 0.25, 0.25);
-		// img_out = img_in;
 
 		//adaptiveThreshold(img_in,img_in,255,ADAPTIVE_THRESH_GAUSSIAN_C,THRESH_BINARY,11,2);
 		if (find_points_in_frame_FP(img_out, points_fronto_parallel)) {
 			cout << "Found in frontoParallel " << endl;
+			int line1  = 7;
+			bool ln = true;
 			for (int p = 0; p < n_points; p++) {
-				circle(img_out, points_fronto_parallel[p], 2, Scalar(0, 255, 0));
+				//circle(img_out, points_fronto_parallel[p], 2, Scalar(0, 255, 0));
+				if(p < n_points - 1 && !(p == line1)){
+					line( img_out, points_fronto_parallel[p], points_fronto_parallel[p+1], Scalar(0, 255, 0), 2, 8 );
+				}if(p == line1){
+					line1 += (ln) ? 9 : 8;
+					ln = !ln;
+				}else if(p+9 < n_points){
+					line( img_out, points_fronto_parallel[p], points_fronto_parallel[p+9], Scalar(0, 255, 0), 2, 8 );
+					line( img_out, points_fronto_parallel[p+9], points_fronto_parallel[p+1], Scalar(0, 255, 0), 2, 8 );
+				}
+				
 			}
 			
 			vector<Point2f> object_p_canonical;
@@ -515,21 +549,6 @@ public:
 	}
 
 	void calibrate_camera() {
-		/*cout << "Running calibration " << endl;
-		vector<Mat> tvecs;
-		vector<Mat> rvecs;
-		for (int o = 0; o < object_points.size(); o++) {
-			cout << o << " " << object_points[o].x << " " << object_points[o].y << endl;
-		}
-		vector<vector<Point3f>> set_object_points(1);
-		cout << "Resize" << endl;
-		set_object_points.resize(set_points.size(), object_points);
-		cout << "CalibrateCamera" << endl;
-		double rms = calibrateCamera(set_object_points, set_points, image_size, camera_matrix,
-		                             dist_coeffs, rvecs, tvecs);
-		cout << camera_matrix << endl;
-		cout << dist_coeffs << endl;
-		cout << "rms " << rms << endl;*/
 		Size boardSize(8, 5);
 		vector<Mat> tvecs;
 		vector<Mat> rvecs;
@@ -562,26 +581,6 @@ public:
 		cout << dist_coeffs   << endl;
 		cout << "rms " << rms << endl;
 	}
-	void test1(){
 
-		for (int i = 0; i < 39; ++i){
-
-			Mat img = imread("frontoParallel/fp_"+ to_string(i) + ".png", 1);
-
-			vector<Point2f> points_fronto_parallel;
-
-			if (find_points_in_frame_FP(img, points_fronto_parallel)) {
-				cout << "Found in frontoParallel " << endl;
-				for (int p = 0; p < points_fronto_parallel.size(); p++) 
-					circle(img, points_fronto_parallel[p], 2, Scalar(0, 255, 0));
-			} else
-				cout << "Not found in FP" << endl;
-
-			imshow("FrontoParallel2", img);
-
-			if (waitKey(0) == 27)
-				break;
-		}
-	}
 
 };

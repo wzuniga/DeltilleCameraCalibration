@@ -266,7 +266,7 @@ bool findSaddleCenters(Mat &gray, vector<Point2f> &order_points, Mat frame, bool
     Mat InitialPointsFounded = frame.clone(); // (480, 600, CV_8UC3, Scalar(0, 0, 0));
     for (int p = 0; p < points2f.size(); p++) {
         circle(InitialPointsFounded, points2f[p], 2, Scalar(0, 255, 0), -1);
-        // putText(InitialPointsFounded, to_string(p),  points2f[p], FONT_HERSHEY_COMPLEX_SMALL, 0.4,  cvScalar(255, 255, 255), 1);
+        //putText(InitialPointsFounded, to_string(p),  points2f[p], FONT_HERSHEY_COMPLEX_SMALL, 0.4,  cvScalar(255, 255, 255), 1);
     }
 
     if (FP)

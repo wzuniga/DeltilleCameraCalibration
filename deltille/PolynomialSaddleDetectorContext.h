@@ -28,6 +28,7 @@
 
 #include "DetectorTools.h"
 #include "PolynomialFit.h"
+#include "ProcessImage.h"
 
 #include <chrono>
 #include <cmath>
@@ -296,8 +297,19 @@ public:
     //gauss_img = input;
     cv::GaussianBlur(gauss_img, gauss_img, cv::Size(7,7), 1.5,1.5);
     
-    // cv::adaptiveThreshold(gauss_img, gauss_img , 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY_INV, 45, 15);
+    //cv::adaptiveThreshold(gauss_img, gauss_img , 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY_INV, 45, 15);
+    
+    /*std::cout << gauss_img.depth() << std::endl;
+    std::cout << gauss_img.channels() << std::endl;
 
+    cv::Mat integralFrame;
+    cv::Mat fixed;
+    gauss_img.convertTo(fixed, CV_8U);
+    fixed.copyTo(integralFrame);
+    thresholdIntegral(fixed, integralFrame);
+    gauss_img = integralFrame;
+    */
+   
     cv::Mat hessian_img;
     
 
